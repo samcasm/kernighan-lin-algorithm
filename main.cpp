@@ -153,6 +153,7 @@ void changeDValue(vector<int> &D, map< pair<int, int>, int> &edgeSet, int a, int
 
 void KLAlgo(map< pair<int, int>, int> &edgeSet, vector<int> &ans, vector<int> &permanent_lock, vector<int> &D, int K1, int nodes, int inodes)
 {	
+
 	int i, j, k;
 	int s1 = inodes-(inodes/K1), s2 = inodes/K1;
 	vector<int> partition1, partition2;
@@ -168,6 +169,8 @@ void KLAlgo(map< pair<int, int>, int> &edgeSet, vector<int> &ans, vector<int> &p
 	vector<int> pos1, pos2;
 	bool gfound;
 	int c;
+
+  cout << partition1.size() << " " << partition2.size() << " " << s2;
 	for( k=0; k < s2/2; ++k)
 	{
 		gfound=false;
@@ -218,6 +221,7 @@ void KLAlgo(map< pair<int, int>, int> &edgeSet, vector<int> &ans, vector<int> &p
 		changeDValue(D, edgeSet, partition1[pnode1], partition2[pnode2], partition1, partition2);
 	}
 	
+  cout << gval.size() << "This is the gval" << endl;
 	int maxg=gval[0], imaxg=gval[0], K=1;
 	for( i=1; i < gval.size(); ++i)
 	{
@@ -253,12 +257,13 @@ void KLAlgo(map< pair<int, int>, int> &edgeSet, vector<int> &ans, vector<int> &p
 		permanent_lock[partition2[i]]=1;
 	}
 	ans.push_back(-1);
+
+  cout << ans.size() << " this is the answer";
 }
 
 
 
-vertex_list * graph_part( int n, int k, vertex_list * edges[], int r ){
-
+void graph_part( int n, int k, vertex_list * edges[], int r ){
 
     int i, j, start_s, stop_s, inodes;
     int K1 = 2;
@@ -270,10 +275,10 @@ vertex_list * graph_part( int n, int k, vertex_list * edges[], int r ){
     std::vector<int> ans;
     
     // permanent lock
-    std::vector<int> permanent_lock;
+    std::vector<int> permanent_lock(nodes, false);
 
     // D values
-    std::vector<int> D;
+    std::vector<int> D(nodes, 0);
 
     // making graph edgeset
     for(int i=0; i<1000; i++){
@@ -283,11 +288,8 @@ vertex_list * graph_part( int n, int k, vertex_list * edges[], int r ){
       edgeSet[make_pair(new_node->v, new_node->next->v)] = 1;
       edgeSet[make_pair(new_node->next->v, new_node->v)] = 1;
 
-      permanent_lock[i] = false;
-      D[i] = 0;
     }
 
-  	
 	if(nodes == K1)
 	{
 		cout<<"Given graph is already divided into "<<K1<<" partitions"<<endl;
@@ -301,7 +303,7 @@ vertex_list * graph_part( int n, int k, vertex_list * edges[], int r ){
 			--K1;
 		}
 		
-		/*
+		
 		cout<<endl<<"The partitions are separated by newline"<<endl;
 		for (i = 0; i < ans.size(); i++)
 		{ 
@@ -310,7 +312,7 @@ vertex_list * graph_part( int n, int k, vertex_list * edges[], int r ){
 	    	else
 	    		cout<<endl;
 		}
-		*/
+		
 	}
 	
 
@@ -318,11 +320,11 @@ vertex_list * graph_part( int n, int k, vertex_list * edges[], int r ){
 
     // cout << new_list->v << " the vertice" << endl;
     // cout << new_list ->next->v << " next vertice" << endl;
-    // cout << new_list ->next->next<< " next vertice" << endl;
+    // // cout << new_list ->next->next<< " next vertice" << endl;
 
     // cout << "Here now";
 
-
+    // return new_list;
 }
 
 int main()
@@ -344,7 +346,7 @@ int main()
         (graph[i])->next->next = NULL;
       }
     printf("Made a cycle, now try to partition it\n"); fflush(stdout);
-    result = graph_part(1000, 500, graph, 100);
+    graph_part(1000, 500, graph, 100);
   //   for(i=0; i<1000; i++)
   //      partition[i]=0;
   //   for( i=0, tmp=result; tmp != NULL; tmp=tmp->next )
