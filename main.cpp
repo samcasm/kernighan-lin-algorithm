@@ -13,6 +13,19 @@ struct v_l {
 typedef struct v_l vertex_list;
 // vertex_list * graph_part( int n, int k, vertex_list * edges[], int r );
 
+void initNode(struct v_l *&head, int n){
+    head->v = n;
+    head->next = NULL;
+}
+
+void addNode(struct v_l *&head, int n){
+    struct v_l *NewNode = new v_l;
+    NewNode-> v = n;
+    NewNode -> next = head;
+    head = NewNode;
+}
+
+
 void swap(vector<int> &partition1, vector<int> &partition2, int pos1, int pos2)
 {
 	int temp = partition1[pos1];
@@ -48,6 +61,14 @@ void partition(vector<int> &partition1, vector<int> &partition2, int s1, int s2,
 			}
 		}
 	}
+
+  // cout << "\n" << "This is first partition: " << endl;
+  // for (int i=0;i<partition1.size();i++){
+  //   if(partition1[i]!=-1)
+	//     		cout<<partition1[i]<<" ";
+	//     	else
+	//     		cout << " this is the end "<<endl;
+  // }
 }
 
 void initializeDValue(vector<int> &D, int nodes)
@@ -221,7 +242,6 @@ void KLAlgo(map< pair<int, int>, int> &edgeSet, vector<int> &ans, vector<int> &p
 		changeDValue(D, edgeSet, partition1[pnode1], partition2[pnode2], partition1, partition2);
 	}
 	
-  cout << gval.size() << "This is the gval" << endl;
 	int maxg=gval[0], imaxg=gval[0], K=1;
 	for( i=1; i < gval.size(); ++i)
 	{
@@ -258,12 +278,11 @@ void KLAlgo(map< pair<int, int>, int> &edgeSet, vector<int> &ans, vector<int> &p
 	}
 	ans.push_back(-1);
 
-  cout << ans.size() << " this is the answer";
 }
 
 
 
-void graph_part( int n, int k, vertex_list * edges[], int r ){
+vertex_list * graph_part( int n, int k, vertex_list * edges[], int r ){
 
     int i, j, start_s, stop_s, inodes;
     int K1 = 2;
@@ -304,17 +323,27 @@ void graph_part( int n, int k, vertex_list * edges[], int r ){
 		}
 		
 		
-		cout<<endl<<"The partitions are separated by newline"<<endl;
-		for (i = 0; i < ans.size(); i++)
-		{ 
-	    	if(ans[i]!=-1)
-	    		cout<<ans[i]<<" ";
-	    	else
-	    		cout<<endl;
-		}
 		
 	}
-	
+
+    struct v_l *head = new v_l;
+    
+    initNode(head, ans[0]);
+
+
+    for (int i=1; i<ans.size();i++){
+      if (ans[i] != -1){
+        addNode(head, ans[i]);
+      }else{
+        break;
+      }
+    }
+
+    return head;
+    // struct v_l* cur  = head;
+    // do {
+    //     printf("Node @ %p : %i\n",(void*)cur, cur->v );
+    // } while ( ( cur = cur->next ) != NULL );
 
     // vertex_list * new_list = edges[5];
 
@@ -346,56 +375,56 @@ int main()
         (graph[i])->next->next = NULL;
       }
     printf("Made a cycle, now try to partition it\n"); fflush(stdout);
-    graph_part(1000, 500, graph, 100);
-  //   for(i=0; i<1000; i++)
-  //      partition[i]=0;
-  //   for( i=0, tmp=result; tmp != NULL; tmp=tmp->next )
-  //   {   partition[tmp->v]=1; i+=1; }
-  //   if( i != 500 )
-  //     printf("the partition has %d vertices, not 500\n", i);fflush(stdout);
-  //   for(i=0, cross = 0; i< 1000; i++)
-  //   {  for( tmp = graph[i]; tmp != NULL; tmp = tmp-> next )  
-  //      {  j = tmp->v;
-	//   if(partition[i] != partition[j])
-  //            cross +=1;
-  //      }
-  //   }
-  //   printf("Partition has %d crossing edges\n\n", cross/2); fflush(stdout);
-  //   printf("Test 2: 300 cycles with 3 vertices each\n");
-  //   /* now fill the graph*/
-  //   for(i=0,j=0; i<300; i++)
-  //   {    graph[3*i] = e+j; j+=1; /*next available edge node */
-	// (graph[3*i])->v = 3*i+1;
-  //       (graph[3*i])->next = e+j; j+=1; /*next available edge node */
-  //       (graph[3*i])->next->v = 3*i+2;
-  //       (graph[3*i])->next->next = NULL;
-  //        graph[3*i+1] = e+j; j+=1; /*next available edge node */
-	// (graph[3*i+1])->v = 3*i;
-  //       (graph[3*i+1])->next = e+j; j+=1; /*next available edge node */
-  //       (graph[3*i+1])->next->v = 3*i+2;
-  //       (graph[3*i+1])->next->next = NULL;
-  //        graph[3*i+2] = e+j; j+=1; /*next available edge node */
-	// (graph[3*i+2])->v = 3*i;
-  //       (graph[3*i+2])->next = e+j; j+=1; /*next available edge node */
-  //       (graph[3*i+2])->next->v = 3*i+1;
-  //       (graph[3*i+2])->next->next = NULL;
-  //   }
-  //   printf("Made 300 K_, now try to partition it\n"); fflush(stdout);
-  //   result=graph_part(900, 300, graph, 100);
-  //   for(i=0; i<9000; i++)
-  //      partition[i]=0;
-  //   for( i=0, tmp=result; tmp != NULL; tmp=tmp->next )
-  //   {   partition[tmp->v]=1; i+=1; }
-  //   if( i != 300 )
-  //     printf("the partition has %d vertices, not 300\n", i);fflush(stdout);
-  //   for(i=0, cross = 0; i< 900; i++)
-  //   {  for( tmp = graph[i]; tmp != NULL; tmp = tmp-> next )  
-  //      {  j = tmp->v;
-	//   if(partition[i] != partition[j])
-  //            cross +=1;
-  //      }
-  //   }
-  //   printf("Partition has %d crossing edges\n", cross/2); fflush(stdout);
+    result = graph_part(1000, 500, graph, 100);
+    for(i=0; i<1000; i++)
+       partition[i]=0;
+    for( i=0, tmp=result; tmp != NULL; tmp=tmp->next )
+    {   partition[tmp->v]=1; i+=1; }
+    if( i != 500 )
+      printf("the partition has %d vertices, not 500\n", i);fflush(stdout);
+    for(i=0, cross = 0; i< 1000; i++)
+    {  for( tmp = graph[i]; tmp != NULL; tmp = tmp-> next )  
+       {  j = tmp->v;
+	  if(partition[i] != partition[j])
+             cross +=1;
+       }
+    }
+    printf("Partition has %d crossing edges\n\n", cross/2); fflush(stdout);
+    printf("Test 2: 300 cycles with 3 vertices each\n");
+    /* now fill the graph*/
+    for(i=0,j=0; i<300; i++)
+    {    graph[3*i] = e+j; j+=1; /*next available edge node */
+	(graph[3*i])->v = 3*i+1;
+        (graph[3*i])->next = e+j; j+=1; /*next available edge node */
+        (graph[3*i])->next->v = 3*i+2;
+        (graph[3*i])->next->next = NULL;
+         graph[3*i+1] = e+j; j+=1; /*next available edge node */
+	(graph[3*i+1])->v = 3*i;
+        (graph[3*i+1])->next = e+j; j+=1; /*next available edge node */
+        (graph[3*i+1])->next->v = 3*i+2;
+        (graph[3*i+1])->next->next = NULL;
+         graph[3*i+2] = e+j; j+=1; /*next available edge node */
+	(graph[3*i+2])->v = 3*i;
+        (graph[3*i+2])->next = e+j; j+=1; /*next available edge node */
+        (graph[3*i+2])->next->v = 3*i+1;
+        (graph[3*i+2])->next->next = NULL;
+    }
+    printf("Made 300 K_, now try to partition it\n"); fflush(stdout);
+    result=graph_part(900, 300, graph, 100);
+    for(i=0; i<9000; i++)
+       partition[i]=0;
+    for( i=0, tmp=result; tmp != NULL; tmp=tmp->next )
+    {   partition[tmp->v]=1; i+=1; }
+    if( i != 300 )
+      printf("the partition has %d vertices, not 300\n", i);fflush(stdout);
+    for(i=0, cross = 0; i< 900; i++)
+    {  for( tmp = graph[i]; tmp != NULL; tmp = tmp-> next )  
+       {  j = tmp->v;
+	  if(partition[i] != partition[j])
+             cross +=1;
+       }
+    }
+    printf("Partition has %d crossing edges\n", cross/2); fflush(stdout);
 
     exit(0);
 } 
