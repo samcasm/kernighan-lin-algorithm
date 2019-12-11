@@ -13,6 +13,8 @@ struct v_l {
 typedef struct v_l vertex_list;
 // vertex_list * graph_part( int n, int k, vertex_list * edges[], int r );
 
+// to create result linked list
+
 void initNode(struct v_l *&head, int n){
     head->v = n;
     head->next = NULL;
@@ -25,6 +27,7 @@ void addNode(struct v_l *&head, int n){
     head = NewNode;
 }
 
+// to swap elements of the two partitions
 
 void swap(vector<int> &partition1, vector<int> &partition2, int pos1, int pos2)
 {
@@ -33,6 +36,7 @@ void swap(vector<int> &partition1, vector<int> &partition2, int pos1, int pos2)
 	partition2[pos2] = temp;
 }
 
+// create initial partitions of k and n-k
 void partition(vector<int> &partition1, vector<int> &partition2, int s1, int s2, vector<int> &permanent_lock, int nodes)
 {
 	int i;
@@ -62,6 +66,7 @@ void partition(vector<int> &partition1, vector<int> &partition2, int s1, int s2,
 		}
 	}
 
+	//to print both partitions
   // cout << "\n" << "This is first partition: " << endl;
   // for (int i=0;i<partition1.size();i++){
   //   if(partition1[i]!=-1)
@@ -71,6 +76,7 @@ void partition(vector<int> &partition1, vector<int> &partition2, int s1, int s2,
   // }
 }
 
+// initialize a DValues vector
 void initializeDValue(vector<int> &D, int nodes)
 {
 	int i;
@@ -80,7 +86,8 @@ void initializeDValue(vector<int> &D, int nodes)
 	}
 }
 
-int container(int node, vector<int> &partition1, vector<int> &partition2)
+// check which partition the vertice lies in
+int in_which_container(int node, vector<int> &partition1, vector<int> &partition2)
 {
 	if (find(partition1.begin(), partition1.end(), node) != partition1.end() )
 		return 1;
@@ -88,8 +95,11 @@ int container(int node, vector<int> &partition1, vector<int> &partition2)
 		return 2;
 }
 
+// find initial D values
 void findDValue(vector<int> &D, map< pair<int, int>, int> &edgeSet, vector<int> &partition1, vector<int> &partition2)
 {
+	// edgeSet: vector<pair (vertice1, vertice2)> , <pair (vertice2, vertice1)> as graph is undirected
+
   	pair<int, int> p;
   	int node1, node2;
   	int container_node1, container_node2;
@@ -101,10 +111,12 @@ void findDValue(vector<int> &D, map< pair<int, int>, int> &edgeSet, vector<int> 
   		edgeWeight = it->second;
 
   		node1 = p.first;
-  		container_node1 = container(node1, partition1, partition2);
+  		container_node1 = in_which_container(node1, partition1, partition2);
 
   		node2 = p.second;
-		container_node2 = container(node2, partition1, partition2);
+		container_node2 = in_which_container(node2, partition1, partition2);
+
+		// if both nodes in same container
 
 		if(container_node1 == container_node2)
 		{
@@ -119,6 +131,8 @@ void findDValue(vector<int> &D, map< pair<int, int>, int> &edgeSet, vector<int> 
 	}
 }
 
+// update D values for all vertices in both partitions except a and b
+// where a from partition A and b from partition B, and g = D[a] + D[b] – 2*c(a, b) is maximal
 void changeDValue(vector<int> &D, map< pair<int, int>, int> &edgeSet, int a, int b, vector<int> &partition1, vector<int> &partition2)
 {
 	int i, c1, c2, x, y;
@@ -171,27 +185,30 @@ void changeDValue(vector<int> &D, map< pair<int, int>, int> &edgeSet, int a, int
 	}
 }
 
+// permanent_lock: vector that keeps track of vertices to remove from further considerations
+// K1: number of partitions
+// n_vertices: Total vertices
+// rem_vertices: Remaining vertices left to be considered in the next iteration
 
-void KLAlgo(map< pair<int, int>, int> &edgeSet, vector<int> &ans, vector<int> &permanent_lock, vector<int> &D, int K1, int nodes, int inodes)
+void KLAlgo(map< pair<int, int>, int> &edgeSet, vector<int> &answer, vector<int> &permanent_lock, vector<int> &D, int K1, int n_vertices, int rem_vertices)
 {	
 
 	int i, j, k;
-	int s1 = inodes-(inodes/K1), s2 = inodes/K1;
+	int s1 = rem_vertices-(rem_vertices/K1), s2 = rem_vertices/K1;
 	vector<int> partition1, partition2;
-	vector<int> lock(nodes, false);		
+	vector<int> lock(n_vertices, false);		
 
-	partition(partition1, partition2, s1, s2, permanent_lock, nodes);
-	initializeDValue(D, nodes);
+	partition(partition1, partition2, s1, s2, permanent_lock, n_vertices);
+	initializeDValue(D, n_vertices);
 	findDValue(D, edgeSet, partition1, partition2);
 
 	int g, ig;
-	int pnode1, pnode2;
+	int vertice1, vertice2;
 	vector<int> gval;
 	vector<int> pos1, pos2;
 	bool gfound;
 	int c;
 
-  // cout << partition1.size() << " " << partition2.size() << " " << s2;
 	for( k=0; k < s2/2; ++k)
 	{
 		gfound=false;
@@ -212,8 +229,8 @@ void KLAlgo(map< pair<int, int>, int> &edgeSet, vector<int> &ans, vector<int> &p
 					{
 						g = D[partition1[i]] + D[partition2[j]] - 2*(c);
 						
-						pnode1 = i;
-						pnode2 = j;
+						vertice1 = i;
+						vertice2 = j;
 						gfound = true;
  					}
  					else
@@ -223,23 +240,23 @@ void KLAlgo(map< pair<int, int>, int> &edgeSet, vector<int> &ans, vector<int> &p
  						if(ig>g)
  						{
  							g = ig;
-							pnode1 = i;
-							pnode2 = j;
+							vertice1 = i;
+							vertice2 = j;
 						}
 					}
 				}
 			}
 		}
 		
-		lock[ partition1[pnode1] ] = true;
-		pos1.push_back(pnode1);
+		lock[ partition1[vertice1] ] = true;
+		pos1.push_back(vertice1);
 		
-		pos2.push_back(pnode2);
-		lock[ partition2[pnode2] ] = true;
+		pos2.push_back(vertice2);
+		lock[ partition2[vertice2] ] = true;
 			
 		gval.push_back(g);
 
-		changeDValue(D, edgeSet, partition1[pnode1], partition2[pnode2], partition1, partition2);
+		changeDValue(D, edgeSet, partition1[vertice1], partition2[vertice2], partition1, partition2);
 	}
 	
 	int maxg=gval[0], imaxg=gval[0], K=1;
@@ -265,40 +282,42 @@ void KLAlgo(map< pair<int, int>, int> &edgeSet, vector<int> &ans, vector<int> &p
 	{
 		for(i = 0; i < partition1.size(); ++i)
 		{
-			ans.push_back(partition1[i]);
+			answer.push_back(partition1[i]);
 			permanent_lock[partition1[i]]=1;
 		}
-		ans.push_back(-1);
+		answer.push_back(-1);
 	}
 
 	for(i=0;i<partition2.size();++i)
 	{
-		ans.push_back(partition2[i]);
+		answer.push_back(partition2[i]);
 		permanent_lock[partition2[i]]=1;
 	}
-	ans.push_back(-1);
+	answer.push_back(-1);
 
 }
 
 
 
 vertex_list * graph_part( int n, int k, vertex_list * edges[], int r ){
-    int i, j, start_s, stop_s, inodes;
+    int i, j, rem_vertices;
     int K1 = n/k;
-    int nodes = n;
-    inodes = nodes;
+    int n_vertices = n;
+    rem_vertices = n_vertices;
 
     map<pair<int,int>,int> edgeSet;
     std::vector<int> vertices;
-    std::vector<int> ans;
+    std::vector<int> answer;
     
-    // permanent lock
-    std::vector<int> permanent_lock(nodes, false);
+    // permanent lock vector init
+    std::vector<int> permanent_lock(n_vertices, false);
 
-    // D values
-    std::vector<int> D(nodes, 0);
+    // D values vector init
+    std::vector<int> D(n_vertices, 0);
 
-    // making graph edgeset
+    // making graph edgeset where 
+	//<vector> : pair(vertice1, vertice2) = 1, pair(vertice2, vertice1) = 1
+	// as the graph is undirected and unweighted
     for(int i=0; i<n; i++){
       vertex_list * new_node = edges[i];
       // cout << " "<< i << " " << new_node->v << " " << new_node->next->v << endl;
@@ -308,7 +327,7 @@ vertex_list * graph_part( int n, int k, vertex_list * edges[], int r ){
 
     }
 
-	if(nodes == K1)
+	if(n_vertices == K1)
 	{
 		cout<<"Given graph is already divided into "<<K1<<" partitions"<<endl;
 	}
@@ -316,8 +335,8 @@ vertex_list * graph_part( int n, int k, vertex_list * edges[], int r ){
 	{
 		while(K1 != 1)
 		{
-			KLAlgo(edgeSet, ans, permanent_lock, D, K1, nodes, inodes);
-			inodes = inodes - (inodes/K1);
+			KLAlgo(edgeSet, answer, permanent_lock, D, K1, n_vertices, rem_vertices);
+			rem_vertices = rem_vertices - (rem_vertices/K1);
 			--K1;
 		}			
 		
@@ -325,12 +344,12 @@ vertex_list * graph_part( int n, int k, vertex_list * edges[], int r ){
 
     struct v_l *head = new v_l;
     
-    initNode(head, ans[0]);
+    initNode(head, answer[0]);
 
 
-    for (int i=1; i<ans.size();i++){
-      if (ans[i] != -1){
-        addNode(head, ans[i]);
+    for (int i=1; i<answer.size();i++){
+      if (answer[i] != -1){
+        addNode(head, answer[i]);
       }else{
         break;
       }
@@ -343,15 +362,6 @@ vertex_list * graph_part( int n, int k, vertex_list * edges[], int r ){
     //     printf("Node @ %p : %i\n",(void*)cur, cur->v );
     // } while ( ( cur = cur->next ) != NULL );
 
-    // vertex_list * new_list = edges[5];
-
-    // cout << new_list->v << " the vertice" << endl;
-    // cout << new_list ->next->v << " next vertice" << endl;
-    // // cout << new_list ->next->next<< " next vertice" << endl;
-
-    // cout << "Here now";
-
-    // return new_list;
 }
 
 int main()
