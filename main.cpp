@@ -191,7 +191,7 @@ void KLAlgo(map< pair<int, int>, int> &edgeSet, vector<int> &ans, vector<int> &p
 	bool gfound;
 	int c;
 
-  cout << partition1.size() << " " << partition2.size() << " " << s2;
+  // cout << partition1.size() << " " << partition2.size() << " " << s2;
 	for( k=0; k < s2/2; ++k)
 	{
 		gfound=false;
@@ -283,9 +283,8 @@ void KLAlgo(map< pair<int, int>, int> &edgeSet, vector<int> &ans, vector<int> &p
 
 
 vertex_list * graph_part( int n, int k, vertex_list * edges[], int r ){
-
     int i, j, start_s, stop_s, inodes;
-    int K1 = 2;
+    int K1 = n/k;
     int nodes = n;
     inodes = nodes;
 
@@ -300,7 +299,7 @@ vertex_list * graph_part( int n, int k, vertex_list * edges[], int r ){
     std::vector<int> D(nodes, 0);
 
     // making graph edgeset
-    for(int i=0; i<1000; i++){
+    for(int i=0; i<n; i++){
       vertex_list * new_node = edges[i];
       // cout << " "<< i << " " << new_node->v << " " << new_node->next->v << endl;
       vertices.push_back(i);
@@ -320,9 +319,7 @@ vertex_list * graph_part( int n, int k, vertex_list * edges[], int r ){
 			KLAlgo(edgeSet, ans, permanent_lock, D, K1, nodes, inodes);
 			inodes = inodes - (inodes/K1);
 			--K1;
-		}
-		
-		
+		}			
 		
 	}
 
@@ -338,8 +335,9 @@ vertex_list * graph_part( int n, int k, vertex_list * edges[], int r ){
         break;
       }
     }
-
+    // cout << ans.size() << " size" << endl;
     return head;
+
     // struct v_l* cur  = head;
     // do {
     //     printf("Node @ %p : %i\n",(void*)cur, cur->v );
@@ -369,7 +367,7 @@ int main()
     /* now fill it as a cycle */
     for(i=0,j=0; i<1000; i++)
       {  graph[i] = e+j; j+=1; /*next available edge node */
-	(graph[i])->v = (i+999)%1000;
+	      (graph[i])->v = (i+999)%1000;
         (graph[i])->next = e+j; j+=1; /*next available edge node */
         (graph[i])->next->v = (i+1)%1000;
         (graph[i])->next->next = NULL;
@@ -394,24 +392,24 @@ int main()
     /* now fill the graph*/
     for(i=0,j=0; i<300; i++)
     {    graph[3*i] = e+j; j+=1; /*next available edge node */
-	(graph[3*i])->v = 3*i+1;
+	      (graph[3*i])->v = 3*i+1;
         (graph[3*i])->next = e+j; j+=1; /*next available edge node */
         (graph[3*i])->next->v = 3*i+2;
         (graph[3*i])->next->next = NULL;
          graph[3*i+1] = e+j; j+=1; /*next available edge node */
-	(graph[3*i+1])->v = 3*i;
+	      (graph[3*i+1])->v = 3*i;
         (graph[3*i+1])->next = e+j; j+=1; /*next available edge node */
         (graph[3*i+1])->next->v = 3*i+2;
         (graph[3*i+1])->next->next = NULL;
          graph[3*i+2] = e+j; j+=1; /*next available edge node */
-	(graph[3*i+2])->v = 3*i;
+	      (graph[3*i+2])->v = 3*i;
         (graph[3*i+2])->next = e+j; j+=1; /*next available edge node */
         (graph[3*i+2])->next->v = 3*i+1;
         (graph[3*i+2])->next->next = NULL;
     }
     printf("Made 300 K_, now try to partition it\n"); fflush(stdout);
-    result=graph_part(900, 300, graph, 100);
-    for(i=0; i<9000; i++)
+    result = graph_part(900, 300, graph, 100);
+    for(i=0; i<900; i++)
        partition[i]=0;
     for( i=0, tmp=result; tmp != NULL; tmp=tmp->next )
     {   partition[tmp->v]=1; i+=1; }
